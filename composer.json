@@ -1,0 +1,21 @@
+{
+  "name": "ellsif/ui_component",
+  "description": "UI Component Manager",
+  "keywords": ["php", "ui", "scss"],
+  "type": "project",
+  "license": "MIT",
+  "homepage": "https://github.com/ellsif/ui_component",
+  "authors": [
+    {
+      "name": "ellsif",
+      "email": "hatasu@ellsif.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "ellsif\\ui_component\\": [
+        "src/"
+      ]
+    }
+  }
+}
