@@ -27,13 +27,13 @@ abstract class UiComponentBase
     protected $version;
 
     public const MEDIA_SIZE_LIST = [
-        'sm', 'md', 'lg', 'xl'
+        '', 'sm', 'md', 'lg', 'xl'
     ];
 
-    public function __construct($values, $attributeId, $childComponents, $options = [])
+    public function __construct($values, $attributes, $childComponents, $options = [])
     {
         $this->values = array_merge(static::getDefaultValues(), $values);
-        $this->attributeId = $attributeId;
+        $this->attributes = array_merge(static::getDefaultAttributes(), $attributes);
         $this->childComponents = $childComponents;
 
         // TODO attributesについては別途検討が必要になる。
@@ -124,7 +124,7 @@ abstract class UiComponentBase
             ob_end_clean();
             $css .= $scss;  // TODO 加工して専用のCSSにする
         }
-        return $css;
+        return $this->scssCompile($css);
     }
 
     /**
@@ -157,5 +157,16 @@ abstract class UiComponentBase
     public function getDocument()
     {
         return 'in preparation';
+    }
+
+    // 切り出したSCSSを加工してコンパイル
+    protected function scssCompile($scss) {
+        $from = mb_strpos($scss, '{') + 1;
+        $to = mb_strpos($scss, '</') - $from;
+        $scss = mb_substr($scss, $from, $to);
+        $scss = '.' . $this->componentName . '-' . $this->version .' {' . $scss;
+        $scss = addslashes(trim(str_replace("\n", "" , $scss)));
+        $scss = exec("echo \"".$scss."\" | sass -s -t compressed --scss");
+        return $scss;
     }
 }

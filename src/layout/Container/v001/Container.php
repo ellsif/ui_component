@@ -37,8 +37,9 @@ class Container extends UiComponentBase
         if ($type === '') {
             ?>
             <style type="text/scss">
-                .container {
-                    max-width: $containerMaxWidth;
+                .Container {
+                    @include make-container();
+                    @include make-container-max-widths();
                 }
             </style>
             <?php
