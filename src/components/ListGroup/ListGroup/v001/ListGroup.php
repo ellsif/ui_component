@@ -1,16 +1,16 @@
 <?php
-namespace ellsif\ui_component\components\Button\v001;
+namespace ellsif\ui_component\components\ListGroup\ListGroup\v001;
 
 use ellsif\ui_component\UiComponentBase;
 
-class Button extends UiComponentBase
+class ListGroup extends UiComponentBase
 {
     /**
      * コンポーネントのラベル（表示名）を取得します。
      */
     public function getLabel()
     {
-        return 'ボタン';
+        return 'リスト';
     }
 
     public static function getAttributes()
@@ -86,7 +86,6 @@ class Button extends UiComponentBase
     {
         return [
 			'text' => 'ボタン',
-			'href' => '#',
 		];
     }
 
@@ -99,17 +98,35 @@ class Button extends UiComponentBase
             ?>
             <style type="text/scss">
                 .Button {
+					display: inline-block;
+					font-weight: 400;
+					text-align: center;
+					vertical-align: middle;
+					padding: 0.375rem 0.75rem;
+					font-size: 1rem;
+					line-height: 1.5;
+					background-color: transparent;
+					border: 1px solid transparent;
+					border-radius: 0.25rem;
+					color: #000;
+					text-decoration: none;
+					cursor: pointer;
+					&.btn-primary {
+						color: #fff;
+						background-color: #007bff;
+						border-color: #007bff;
+					}
 					&.btn-sm {
-						padding: 5px;
+						font-size: 0.75rem;
 					}
 					&.btn-lg {
-						padding: 12px;
+						font-size: 1.25rem;
 					}
 					&.btn-xs {
-						padding: 3px;
+						font-size: 0.5rem;
 					}
 					&.btn-xl {
-						padding: 18px;
+						font-size: 1.5rem;
 					}
                 }
             </style>

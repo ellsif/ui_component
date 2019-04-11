@@ -8,20 +8,17 @@ abstract class UiComponentBase
 {
     protected $id;
 
-    // HTMLに埋め込む値の配列
-    protected $values;
-
-    // AttributeのID
-    protected $attributeId;
-
     // Attributes（CSSに埋め込む値の配列）
     protected $attributes;
 
-    // 子コンポーネント
-    protected $childComponents;
+    // 子コンポーネントの配列（UiComponentまたはstring）
+    protected $childComponents = [];
 
     // コンポーネントの名前（class名に利用）
     protected $componentName;
+
+    // オプション（追加SCSS）
+    protected $optionScssFiles;
 
     // コンポーネントのバージョン
     protected $version;
@@ -30,35 +27,57 @@ abstract class UiComponentBase
         '', 'sm', 'md', 'lg', 'xl'
     ];
 
-    public function __construct($values, $attributes, $childComponents, $options = [])
+    public function __construct($attributes, $optionScssFiles = [])
     {
-        $this->values = array_merge(static::getDefaultValues(), $values);
         $this->attributes = array_merge(static::getDefaultAttributes(), $attributes);
-        $this->childComponents = $childComponents;
-
-        // TODO attributesについては別途検討が必要になる。
-        /*
-        if ($attributes) {
-            // TODO attributesが追加された場合、CSSが変わるため、個別のidを指定する必要がある。
-            $this->attributes = array_merge(static::getDefaultAttributes(), $attributes);
-        }
-        */
-
         $class = get_class($this);
         $classNames = explode("\\", $class);
         $this->componentName = $classNames[count($classNames) - 1];
         $this->version = $classNames[count($classNames) - 2];
+        $this->optionScssFiles = $optionScssFiles;
+    }
 
-        // TODO オプションの扱い
-        // _valiables.scssとかを追加したい場合がある・・・？
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * 子コンポーネントを追加します。
+     */
+    public function addChildComponent($component)
+    {
+        if (is_string($component) || $component instanceof UiComponentBase) {
+            $this->childComponents[] = $component;
+        } else {
+            throw new \InvalidArgumentException('invalid argument type addChild()');
+        }
+        return $this;
+    }
+
+    /**
+     * 子コンポーネントのリストを取得します。
+     */
+    public function getChildComponents()
+    {
+        return $this->childComponents;
     }
 
     /**
      * コンポーネントの名称を取得します。
      */
-    public function getComponentName()
+    public function getComponentName($includeVersion = false)
     {
-        return $this->componentName;
+        if ($includeVersion) {
+            return $this->componentName . '-' . $this->getVersion();
+        } else {
+            return $this->componentName;
+        }
     }
 
     /**
@@ -74,22 +93,28 @@ abstract class UiComponentBase
      */
     public function getClassName()
     {
-        $className = $this->componentName . '-' . $this->version;
-        if ($this->attributeId) {
-            $className .= ' attribute-' . $this->attributeId;
-        }
+        $className = $this->getComponentName(true) . ' ' .
+            $this->getComponentName() . '-' . $this->getId();
         return $className;
     }
 
     /**
-     * デフォルトのattributesを返します。
+     * 設定可能なattributeの選択肢を取得します。
      */
-    public static abstract function getDefaultAttributes();
+    abstract public static function getAttributes();
 
     /**
-     * デフォルトのvaluesを返します。
+     * attributeの初期値を取得します。
      */
-    public static abstract function getDefaultValues();
+    public static function getDefaultAttributes()
+    {
+        $attributes = static::getAttributes();
+        $default = [];
+        foreach($attributes as $name => $settings) {
+            $default[$name] = $settings['values'][0] ?? '';
+        }
+        return $default;
+    }
 
     /**
      * コンポーネントのCSS(SCSS)を取得します。
@@ -122,7 +147,7 @@ abstract class UiComponentBase
             $this->css($size);
             $scss = ob_get_contents();
             ob_end_clean();
-            $css .= $scss;  // TODO 加工して専用のCSSにする
+            $css .= $scss;
         }
         return $this->scssCompile($css);
     }
@@ -161,12 +186,17 @@ abstract class UiComponentBase
 
     // 切り出したSCSSを加工してコンパイル
     protected function scssCompile($scss) {
+        // colors
+        $colors = file_get_contents(dirname(__FILE__, 2) . '/scss/colors/default.scss');
         $from = mb_strpos($scss, '{') + 1;
         $to = mb_strpos($scss, '</') - $from;
         $scss = mb_substr($scss, $from, $to);
         $scss = '.' . $this->componentName . '-' . $this->version .' {' . $scss;
-        $scss = addslashes(trim(str_replace("\n", "" , $scss)));
-        $scss = exec("echo \"".$scss."\" | sass -s -t compressed --scss");
-        return $scss;
+        $scss = $colors . "\n" . $scss;
+        $scss = trim($scss);
+        $filepath = 'work/tmp.scss';
+        file_put_contents($filepath, $scss);
+        $css = exec("sass -t compressed --scss " . $filepath);
+        return $css;
     }
 }

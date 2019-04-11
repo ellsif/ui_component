@@ -1,5 +1,5 @@
 <?php
-namespace ellsif\ui_component\layout\Container\v001;
+namespace ellsif\ui_component\layout\Container\Container\v001;
 
 use ellsif\ui_component\UiComponentBase;
 
@@ -11,6 +11,19 @@ class Container extends UiComponentBase
     public function getLabel()
     {
         return 'コンテナ';
+    }
+
+    public static function getAttributes()
+    {
+        return [
+            'fluid' => [
+                'label' => '幅一杯',
+                'values' => [
+                    false,
+					true,
+                ]
+            ],
+		];
     }
 
     /**
@@ -38,8 +51,8 @@ class Container extends UiComponentBase
             ?>
             <style type="text/scss">
                 .Container {
-                    @include make-container();
-                    @include make-container-max-widths();
+                    max-width: 1140px;
+					margin: 0 auto;
                 }
             </style>
             <?php
@@ -60,11 +73,11 @@ class Container extends UiComponentBase
     public function html()
     {
         ?>
-            <div class="<?php echo $this->getClassName() ?>">
-                <?php foreach ($this->childComponents as $childComponent) : ?>
-                    <?php echo $childComponent->getHtml() ?>
-                <?php endforeach ?>
-            </div>
+		<div class="<?php echo $this->getClassName() ?>">
+			<?php foreach ($this->childComponents as $childComponent) : ?>
+				<?php echo $childComponent->getHtml() ?>
+			<?php endforeach ?>
+		</div>
         <?php
     }
 }

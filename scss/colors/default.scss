@@ -1,0 +1,42 @@
+// 基本色定義
+$white: #fff !default;
+$black: #000 !default;
+$textColor: #212121 !default;
+$bgColor: #fff !default;
+
+// Primary Colors
+$primaryBgColor: #2196F3 !default;
+$primaryBgColor-dark: #1976D2 !default;
+$primaryBgColor-light: #BBDEFB !default;
+$primaryTextColor: #fff !default;
+
+// Accent Colors
+$accentBgColor: #448AFF !default;
+$accentTextColor: #fff !default;
+
+// Secondary Colors
+$secondaryTextColor: #757575 !default;
+
+// Divider Colors
+$dividerTextColor: #bdbdbd !default;
+
+// for alert, message, ...
+$success: #388E3C !default;
+$info: #0288D1 !default;
+$warning: #FBC02D !default;
+$danger: #D32F2F !default;
+$light: #bdbdbd !default;
+$dark: #757575 !default;
+
+$theme-colors: () !default;
+$theme-colors: map-merge(
+  (
+    'success': $success,
+    'info': $info,
+    'warning': $warning,
+    'danger': $danger,
+    'light': $light,
+    'dark': $dark,
+  ),
+  $theme-colors
+);
